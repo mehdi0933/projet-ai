@@ -1,0 +1,7 @@
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/DemoApplication.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/config/UserConfig.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/controllers/UserControllers.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/entity/UserEntity.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/services/IUserDataAcces.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/services/IUserRepositoryJpa.java
+/Users/mehdi/Documents/demo/src/main/java/com/formationspring/demo/services/UserService.java
