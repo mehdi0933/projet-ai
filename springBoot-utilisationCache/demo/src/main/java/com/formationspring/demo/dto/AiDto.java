@@ -2,29 +2,61 @@ package com.formationspring.demo.dto;
 
 import com.formationspring.demo.enums.AiModel;
 import com.formationspring.demo.enums.ResponseType;
-import lombok.NonNull;
+import lombok.*;
 import java.time.LocalDateTime;
+
+@NoArgsConstructor
+@Setter
+@Getter
 
 public class AiDto {
 
-    public static record PostInput(
-            @NonNull String promptMsg,
-            @NonNull String apiKey,
-            @NonNull String url,
-            @NonNull AiModel model,
-            @NonNull ResponseType responseType,
-            long durationMs,
-            LocalDateTime searchDateTime
-    ) {}
-    
-    public static record PostOutput(
-            String promptMsg,
-            String apiKey,
-            String url,
-            AiModel model,
-            ResponseType responseType,
-            long durationMs,
-            LocalDateTime searchDateTime
-    ) {}
 
+    private String promptMsg;
+    private String apiKey;
+    private String url;
+    private AiModel model;
+    private ResponseType responseType;
+    private LocalDateTime searchDateTime;
+    private long durationMs;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostInput {
+
+        @NonNull
+        private String promptMsg;
+
+        @NonNull
+        private String apiKey;
+
+        @NonNull
+        private String url;
+
+        @NonNull
+        private AiModel model;
+
+        private ResponseType responseType;
+        private long durationMs;
+        private LocalDateTime searchDateTime;
+
+
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostOutput {
+        private String promptMsg;
+        private String apiKey;
+        private String url;
+        private AiModel model;
+        private ResponseType responseType;
+        private long durationMs;
+        private LocalDateTime searchDateTime;
+    }
 }
+

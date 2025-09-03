@@ -22,19 +22,19 @@ public class ArticleService implements ArticleInterface {
                 .retrieve()
                 .bodyToMono(ArticleEntity.class)
                 .block();
-        return new ArticleDto.Output(
-                entity.getUserId(),
-                entity.getId(),
-                entity.getTitle(),
-                entity.getBody()
-        );
+
+        return ArticleDto.Output.builder()
+                .userId(entity.getUserId())
+                .id(entity.getId())
+                .title(entity.getTitle())
+                .body(entity.getBody())
+                .build();
     }
 
     @Override
     public ArticleDto.Output createPost(ArticleDto articleDto) {
         return null;
     }
-
 
     @Override
     public ArticleDto.Output createPost(ArticleDto.Output articleDtoOutput) {
@@ -45,13 +45,11 @@ public class ArticleService implements ArticleInterface {
                 .bodyToMono(ArticleEntity.class)
                 .block();
 
-        return new ArticleDto.Output(
-                created.getUserId(),
-                created.getId(),
-                created.getTitle(),
-                created.getBody()
-        );
+        return ArticleDto.Output.builder()
+                .userId(created.getUserId())
+                .id(created.getId())
+                .title(created.getTitle())
+                .body(created.getBody())
+                .build();
     }
-
-
 }

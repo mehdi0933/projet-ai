@@ -31,9 +31,9 @@ public class MistralAiSearch extends AbstractAiSearch {
     @Cacheable(value = "aiResponse", key = "#input.promptMsg()")
     public String callApi(AiDto.PostInput input) throws IOException, InterruptedException {
 
-        String apiKey = input.apiKey();
-        String promptMsg = input.promptMsg();
-        String url = input.url();
+        String apiKey = input.getApiKey();
+        String promptMsg = input.getPromptMsg();
+        String url = input.getUrl();
         String requestBody = """
         {
             "model": "mistralai/mistral-7b-instruct:free",

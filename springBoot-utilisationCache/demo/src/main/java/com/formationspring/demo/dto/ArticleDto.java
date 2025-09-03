@@ -1,24 +1,38 @@
 package com.formationspring.demo.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ArticleDto {
 
+    private int userId;
+    private int id;
+    private String title;
+    private String body;
 
-    public static  record Input (
-         String title,
-         String body
-    ) {}
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Input {
+        private String title;
+        private String body;
+    }
 
-
-    public static record Output (
-         int userId,
-         int id,
-         String title,
-         String body
-
-         ) {}
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Output {
+        private int userId;
+        private int id;
+        private String title;
+        private String body;
+    }
 }

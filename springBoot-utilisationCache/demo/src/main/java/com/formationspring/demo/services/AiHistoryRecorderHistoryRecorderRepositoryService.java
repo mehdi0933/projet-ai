@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-@Builder
+
 @Service
 @RequiredArgsConstructor
 public class AiHistoryRecorderHistoryRecorderRepositoryService implements AiHistoryRecorderInterface {
@@ -19,16 +19,15 @@ public class AiHistoryRecorderHistoryRecorderRepositoryService implements AiHist
     @Override
     public void save(AiDto.PostInput input) {
         AiRecordEntity entity = AiRecordEntity.builder()
-                .promptMsg(input.promptMsg())
-                .apiKey(input.apiKey())
-                .url(input.url())
-                .model(input.model())
-                .responseType(input.responseType())
-                .searchDateTime(LocalDateTime.now())
-                .durationMs(input.durationMs())
+                .promptMsg(input.getPromptMsg())
+                .apiKey(input.getApiKey())
+                .url(input.getUrl())
+                .model(input.getModel())
+                .responseType(input.getResponseType())
+                .searchDateTime(input.getSearchDateTime() != null ? input.getSearchDateTime() : LocalDateTime.now())
+                .durationMs(input.getDurationMs())
                 .build();
 
         aiRecordEntityRepository.save(entity);
     }
 }
-

@@ -36,9 +36,9 @@ public class AiRequestHandlerService {
     public String sendAiAPIRequest(AiDto.PostInput input) throws IOException, InterruptedException {
         LocalDateTime now = LocalDateTime.now();
 
-        AbstractAiSearch aiSearch = aiSearchFactory.getAiSearch(input.model());
+        AbstractAiSearch aiSearch = aiSearchFactory.getAiSearch(input.getModel());
 
-        String cacheKey = input.promptMsg();
+        String cacheKey = input.getPromptMsg();
         Cache cache = cacheManager.getCache("aiResponse");
 
         if (cache != null) {
@@ -55,7 +55,7 @@ public class AiRequestHandlerService {
             }
         }
 
-        logger.info("No cache found for prompt: {}", input.promptMsg());
+        logger.info("No cache found for prompt: {}", input.getPromptMsg());
         long start = System.currentTimeMillis();
         String response = aiSearch.callApi(input);
         long end = System.currentTimeMillis();
@@ -75,10 +75,10 @@ public class AiRequestHandlerService {
 
     private AiDto.PostInput createPostInput(AiDto.PostInput original, ResponseType responseType, long durationMs, LocalDateTime searchDateTime) {
         return new AiDto.PostInput(
-                original.promptMsg(),
-                original.apiKey(),
-                original.url(),
-                original.model(),
+                original.getPromptMsg(),
+                original.getApiKey(),
+                original.getUrl(),
+                original.getModel(),
                 responseType,
                 durationMs,
                 searchDateTime

@@ -27,9 +27,9 @@ public class HunyuanAiSearch extends AbstractAiSearch {
     @Override
     public String callApi(AiDto.PostInput postInput) throws IOException, InterruptedException {
 
-        String url = postInput.url();
-        String apiKey = postInput.apiKey();
-        String promptMsg = postInput.promptMsg();
+        String url = postInput.getUrl();
+        String apiKey = postInput.getApiKey();
+        String promptMsg = postInput.getPromptMsg();
 
         String requestBody = """
         {
