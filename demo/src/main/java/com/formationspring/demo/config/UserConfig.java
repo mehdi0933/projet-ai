@@ -1,36 +1,30 @@
 package com.formationspring.demo.config;
 
-import com.formationspring.demo.entity.UserEntity;
-import com.formationspring.demo.services.IUserDataAcces;
-import com.formationspring.demo.services.IUserRepositoryJpa;
-import com.formationspring.demo.services.UserService;
+import com.formationspring.demo.entity.UserDataAccesEntity;
+import com.formationspring.demo.dal.UserRepositoryJpa;
+import com.formationspring.demo.services.UserDataAccessService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @Configuration
 public class UserConfig {
-    private final IUserRepositoryJpa  ;
 
-    public UserConfig(IUserRepositoryJpa userRepository) {
+    private final UserRepositoryJpa userRepository;
+
+    public UserConfig(UserRepositoryJpa userRepository) {
         this.userRepository = userRepository;
     }
 
     @Bean
-    public IUserDataAcces userDataAcces() {
-        return new UserService(userRepository);
+    public UserDataAccessService userDataAccesInterface() {
+        return new UserDataAccessService(userRepository);
     }
 
     @Bean
     public CommandLineRunner userSave() {
         return args -> {
-            userRepository.save(new UserEntity(null, "prenom 1", "nom 1"));
-            userRepository.save(new UserEntity(null, "prenom 2", "nom 2"));
-            userRepository.save(new UserEntity(null, "prenom 3", "nom 3"));
+            userRepository.save(new UserDataAccesEntity(null, "Prenom 1", "Nom 1"));
         };
     }
-
 }
