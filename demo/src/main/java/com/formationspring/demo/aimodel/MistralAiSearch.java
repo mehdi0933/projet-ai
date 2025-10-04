@@ -1,7 +1,8 @@
 package com.formationspring.demo.aimodel;
 
-import com.formationspring.demo.dto.AiDto;
-import org.example.SupportedAi;
+//import com.formationspring.demo.dtoT.AiDtoT;
+import org.example.dto.AiDto;
+import org.example.emu.SupportedAi;
 import com.formationspring.demo.services.Interface.AiHistoryRecorderInterface;
 import org.springframework.stereotype.Component;
 

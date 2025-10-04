@@ -1,7 +1,7 @@
 package com.formationspring.demo.services.Interface;
 
 
-import com.formationspring.demo.dto.AiDto;
+import org.example.dto.AiDto;
 
 public interface AiHistoryRecorderInterface {
 

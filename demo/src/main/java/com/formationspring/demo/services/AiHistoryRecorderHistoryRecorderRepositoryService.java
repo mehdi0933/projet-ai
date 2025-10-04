@@ -1,10 +1,10 @@
 package com.formationspring.demo.services;
 
 import com.formationspring.demo.dal.AiRecordEntityRepository;
-import com.formationspring.demo.dto.AiDto;
+//import com.formationspring.demo.dtoT.AiDtoT;
+import org.example.dto.AiDto;
 import com.formationspring.demo.entity.AiRecordEntity;
 import com.formationspring.demo.services.Interface.AiHistoryRecorderInterface;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

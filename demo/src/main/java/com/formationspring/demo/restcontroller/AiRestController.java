@@ -1,24 +1,21 @@
 package com.formationspring.demo.restcontroller;
 
-import com.formationspring.demo.dto.AiDto;
 import com.formationspring.demo.services.AiRequestHandlerService;
+import org.example.dto.AiDto;
 import org.springframework.web.bind.annotation.*;
-
-
-import java.io.IOException;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/ai")
- public class AiRestController {
+public class AiRestController {
 
     private final AiRequestHandlerService aiRequestHandlerService;
 
     public AiRestController(AiRequestHandlerService aiRequestHandlerService) {
         this.aiRequestHandlerService = aiRequestHandlerService;
     }
+
     @PostMapping("/search")
-    public String search( @RequestBody AiDto.PostInput input) throws Exception {
+    public String search(@RequestBody AiDto.PostInput input) throws Exception {
         return aiRequestHandlerService.sendAiAPIRequest(input);
     }
 
@@ -27,6 +24,7 @@ import java.util.Map;
         return "Hello depuis IA !";
     }
 }
+
 
 /**
  {

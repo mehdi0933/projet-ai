@@ -2,7 +2,6 @@ package com.formationspring.demo.config;
 
 import com.formationspring.demo.entity.UserDataAccesEntity;
 import com.formationspring.demo.dal.UserRepositoryJpa;
-import com.formationspring.demo.services.UserDataAccessService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,14 +16,15 @@ public class UserConfig {
     }
 
     @Bean
-    public UserDataAccessService userDataAccesInterface() {
-        return new UserDataAccessService(userRepository);
-    }
-
-    @Bean
     public CommandLineRunner userSave() {
         return args -> {
-            userRepository.save(new UserDataAccesEntity(null, "Prenom 1", "Nom 1"));
+            // Création d'un utilisateur avec Lombok Builder
+            UserDataAccesEntity user = UserDataAccesEntity.builder()
+                    .firstName("Prenom 1")
+                    .lastName("Nom 1")
+                    .build();
+
+            userRepository.save(user);
         };
     }
 }

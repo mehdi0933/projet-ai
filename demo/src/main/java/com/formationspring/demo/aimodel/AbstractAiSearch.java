@@ -1,7 +1,8 @@
 package com.formationspring.demo.aimodel;
 
-import com.formationspring.demo.dto.AiDto;
-import org.example.SupportedAi;
+//import com.formationspring.demo.dtoT.AiDto;
+import org.example.dto.AiDto;
+import org.example.emu.SupportedAi;
 import java.io.IOException;
 
 public abstract class AbstractAiSearch {

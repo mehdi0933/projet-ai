@@ -1,13 +1,13 @@
-package com.formationspring.demo.dto;
+/**package com.formationspring.demo.dtoT;
 
-import org.example.SupportedAi;  // enum importé depuis le module Maven
+import org.example.emu.SupportedAi;
 import com.formationspring.demo.enums.ResponseType;
 
 import lombok.*;
 import java.time.LocalDateTime;
 
 @Data
-public class AiDto {
+public class AiDtoT {
 
     @Data
     @Builder(toBuilder = true)
@@ -17,7 +17,7 @@ public class AiDto {
         private String promptMsg;
         private String apiKey;
         private String url;
-        private SupportedAi model;  // <-- remplacé AiModel par SupportedAi
+        private SupportedAi model;
         private ResponseType responseType;
         private long durationMs;
         private LocalDateTime searchDateTime;
@@ -31,9 +31,9 @@ public class AiDto {
         private String promptMsg;
         private String apiKey;
         private String url;
-        private SupportedAi model;  // <-- remplacé AiModel par SupportedAi
+        private SupportedAi model;
         private ResponseType responseType;
         private long durationMs;
         private LocalDateTime searchDateTime;
     }
-}
+}*/

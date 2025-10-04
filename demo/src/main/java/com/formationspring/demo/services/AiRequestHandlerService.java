@@ -1,10 +1,12 @@
 package com.formationspring.demo.services;
 
 import com.formationspring.demo.aimodel.AbstractAiSearch;
-import com.formationspring.demo.dto.AiDto;
-import com.formationspring.demo.enums.ResponseType;
-import com.formationspring.demo.services.Interface.AiHistoryRecorderInterface;
+//import com.formationspring.demo.dtoT.AiDtoT;
 import com.formationspring.demo.tools.AiSearchFactory;
+import org.example.dto.AiDto;
+//import com.formationspring.demo.enums.ResponseType;
+import com.formationspring.demo.services.Interface.AiHistoryRecorderInterface;
+import org.example.emu.ResponseType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.Cache;

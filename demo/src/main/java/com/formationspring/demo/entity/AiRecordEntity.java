@@ -1,7 +1,7 @@
 package com.formationspring.demo.entity;
 
-import org.example.SupportedAi;  // enum importé depuis le module Maven
-import com.formationspring.demo.enums.ResponseType;
+import org.example.emu.ResponseType;
+import org.example.emu.SupportedAi;  //
 import jakarta.persistence.*;
 import lombok.*;
 

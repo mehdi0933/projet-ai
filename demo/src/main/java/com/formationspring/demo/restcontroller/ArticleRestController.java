@@ -5,8 +5,6 @@ import com.formationspring.demo.mapper.ArticleMapper;
 import com.formationspring.demo.services.Interface.ArticleInterface;
 import org.springframework.web.bind.annotation.*;
 
-import static com.formationspring.demo.mapper.UserDataAccessMapper.fromInput;
-
 @RestController
 @RequestMapping("/Post")
 public class ArticleRestController {

@@ -1,6 +1,6 @@
 package com.formationspring.demo.mapper;
-
-import com.formationspring.demo.dto.AiDto;
+import org.example.dto.AiDto;
+//import com.formationspring.demo.dtoT.AiDtoT;
 import org.springframework.stereotype.Component;
 
 @Component
