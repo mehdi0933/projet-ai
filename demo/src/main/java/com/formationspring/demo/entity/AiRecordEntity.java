@@ -31,4 +31,7 @@ public class AiRecordEntity {
 
     @Enumerated(EnumType.STRING)
     private ResponseType responseType;
+
+    @ManyToOne @JoinColumn(name = "user_id")
+    private UserEntity user;
 }

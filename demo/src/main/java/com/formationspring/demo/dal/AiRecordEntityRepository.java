@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AiRecordEntityRepository extends JpaRepository<AiRecordEntity,Long> {
+
+    AiRecordEntity findByUser_Mail(String mail);
 }
