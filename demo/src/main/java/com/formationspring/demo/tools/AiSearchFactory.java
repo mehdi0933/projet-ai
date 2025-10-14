@@ -1,6 +1,6 @@
 package com.formationspring.demo.tools;
 
-import com.formationspring.demo.aimodel.AbstractAiSearch;
+import com.formationspring.demo.model.ai.AbstractAiSearch;
 import org.example.emu.SupportedAi;
 import org.springframework.stereotype.Component;
 import java.util.HashMap;

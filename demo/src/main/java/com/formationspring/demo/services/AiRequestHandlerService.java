@@ -1,8 +1,7 @@
 package com.formationspring.demo.services;
 
-import com.formationspring.demo.aimodel.AbstractAiSearch;
+import com.formationspring.demo.model.ai.AbstractAiSearch;
 //import com.formationspring.demo.dtoT.AiDtoT;
-import com.formationspring.demo.services.AiRequestHandlerService;
 import com.formationspring.demo.tools.AiSearchFactory;
 import org.example.dto.AiDto;
 //import com.formationspring.demo.enums.ResponseType;
@@ -51,7 +50,7 @@ public class AiRequestHandlerService {
                 logger.info("Cache hit for prompt: {}", cacheKey);
                 logger.info("Cached value: {} date de la requête {}", cachedValue, now);
 
-                AiDto.PostInput cacheInput = createPostInput(input, ResponseType.CACHE, 0L, now);
+                AiDto.PostInput cacheInput = prepareInputForLogging(input, ResponseType.CACHE, 0L, now);
                 llmAi.save(cacheInput);
 
                 return cachedValue;
@@ -68,7 +67,7 @@ public class AiRequestHandlerService {
             cache.put(cacheKey, response);
         }
 
-        AiDto.PostInput aiInput = createPostInput(input, ResponseType.AI, duration, now);
+        AiDto.PostInput aiInput = prepareInputForLogging(input, ResponseType.AI, duration, now);
         llmAi.save(aiInput);
 
         logger.info("Durée de la requête API : {} ms, date de la requête {}", duration, now);
@@ -76,15 +75,18 @@ public class AiRequestHandlerService {
         return response;
     }
 
-    private AiDto.PostInput createPostInput(AiDto.PostInput original, ResponseType responseType, long durationMs, LocalDateTime searchDateTime) {
+    private AiDto.PostInput prepareInputForLogging(AiDto.PostInput original, ResponseType responseType, long durationMs, LocalDateTime searchDateTime) {
         return new AiDto.PostInput(
+                null,
                 original.getPromptMsg(),
                 original.getApiKey(),
                 original.getUrl(),
                 original.getModel(),
                 responseType,
                 durationMs,
-                searchDateTime
+                searchDateTime,
+                null
+                //original.getUser()
         );
     }
 

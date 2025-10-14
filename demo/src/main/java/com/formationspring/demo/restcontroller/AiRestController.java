@@ -1,5 +1,6 @@
 package com.formationspring.demo.restcontroller;
 
+import com.formationspring.demo.services.AiHistoryRecorderHistoryService;
 import com.formationspring.demo.services.AiRequestHandlerService;
 import org.example.dto.AiDto;
 import org.springframework.web.bind.annotation.*;
@@ -8,10 +9,24 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/ai")
 public class AiRestController {
 
-    private final AiRequestHandlerService aiRequestHandlerService;
+    private AiRequestHandlerService aiRequestHandlerService;
+    private AiHistoryRecorderHistoryService aiHistoryRecorderService;
 
-    public AiRestController(AiRequestHandlerService aiRequestHandlerService) {
+    public AiRestController(AiRequestHandlerService aiRequestHandlerService, AiHistoryRecorderHistoryService aiHistoryRecorderService) {
         this.aiRequestHandlerService = aiRequestHandlerService;
+        this.aiHistoryRecorderService = aiHistoryRecorderService;
+    }
+
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello depuis IA !";
+    }
+
+    @GetMapping("/id/{id}")
+    public String findByIdRequest(@PathVariable String mail) {
+        AiDto.PostOutput searchResultById = aiHistoryRecorderService.findPostByMail(mail);
+        return searchResultById != null ? searchResultById.toString() : "Aucun résultat trouvé pour id=" + mail;
     }
 
     @PostMapping("/search")
@@ -19,10 +34,7 @@ public class AiRestController {
         return aiRequestHandlerService.sendAiAPIRequest(input);
     }
 
-    @GetMapping("/hello")
-    public String hello() {
-        return "Hello depuis IA !";
-    }
+
 }
 
 
