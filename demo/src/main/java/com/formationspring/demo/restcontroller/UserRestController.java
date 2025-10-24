@@ -44,4 +44,13 @@ public class UserRestController {
         return userService.saveAllUsers(users);
     }
 
+    @GetMapping("/test/permisAll")
+    public String permisAll() {
+        return "je suis le test permisAll";
+    }
+
+    @GetMapping("/test/security")
+    public String security() {
+        return "je suis le test security ";
+    }
 }

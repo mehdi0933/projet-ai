@@ -32,6 +32,24 @@ public class SecurityConfig {
         this.userRepositoryJpa = userRepositoryJpa;
     }
 
+    // SecurityFilterChain — le cœur de la config
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // Désactive CSRF pour API REST
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT = stateless
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/user/login","/user/test/permisAll").permitAll() // autorisés sans token
+                        .requestMatchers("/user/test/security").authenticated()
+                        .anyRequest().authenticated() // le reste nécessite un token
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // ajout du filtre JWT
+
+        return http.build();
+    }
+
+
     // 🔹 Définition du UserDetailsService
     @Bean
     public UserDetailsService userDetailsService() {
@@ -55,20 +73,5 @@ public class SecurityConfig {
         provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
-    }
-
-    // 🔹 SecurityFilterChain — le cœur de la config
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // Désactive CSRF pour API REST
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT = stateless
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/user/login").permitAll() // autorisés sans token
-                        .anyRequest().authenticated() // le reste nécessite un token
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // ajout du filtre JWT
-
-        return http.build();
     }
 }
