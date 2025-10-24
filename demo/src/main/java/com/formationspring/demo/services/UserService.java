@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,21 +42,29 @@ public class UserService implements UserInterface {
     @Override
     public List<UserDto.PostOutput> saveAllUsers(List<UserDto.PostInput> users) {
 
-        List<String> mailsToCheck = users.stream()
-                .map(UserDto.PostInput::getMail)
-                .toList();
+        List<UserEntity> existingUsers = userRepositoryJpa.findAllByMailIn(
+                users.stream().map(UserDto.PostInput::getMail).toList()
+        );
 
-        List<String> existingMails = userRepositoryJpa.findAllByMailIn(mailsToCheck).stream()
-                .map(UserEntity::getMail)
-                .toList();
+        Map<String, UserEntity> existingMails = existingUsers.stream()
+                .collect(Collectors.toMap(
+                        UserEntity::getMail,
+                        u -> u,
+                        (existing, replacement) -> existing
+                ));
 
         return users.stream().map(input -> {
-            if (existingMails.contains(input.getMail())) {
+            if (existingMails.containsKey(input.getMail())) {
+                //UserEntity user = existingMails.get(input.getMail());
+                UserEntity user = existingMails.get(input.getMail());
                 return UserDto.PostOutput.builder()
-                        .mail(input.getMail())
+                        .id(user.getId())
+                        .mail(user.getMail())
+                        .searchDateTime(user.getSearchDateTime())
                         .build();
             } else {
                 UserEntity entity = new UserEntity();
+                entity.setId(input.getId());
                 entity.setMail(input.getMail());
                 entity.setPassword(passwordEncoder.encode(input.getPassword()));
                 entity.setSearchDateTime(LocalDateTime.now());
