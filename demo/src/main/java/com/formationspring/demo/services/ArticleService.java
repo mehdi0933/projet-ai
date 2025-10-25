@@ -1,55 +1,33 @@
 package com.formationspring.demo.services;
 
 import com.formationspring.demo.dto.ArticleDto;
-import com.formationspring.demo.entity.ArticleEntity;
 import com.formationspring.demo.services.Interface.ArticleInterface;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@RequiredArgsConstructor
 public class ArticleService implements ArticleInterface {
 
     private final WebClient webClient;
 
-    public ArticleService(WebClient webClient) {
-        this.webClient = webClient;
-    }
-
     @Override
     public ArticleDto.Output findPostById(int id) {
-        ArticleEntity entity = webClient.get()
+        return webClient.get()
                 .uri("/posts/{id}", id)
                 .retrieve()
-                .bodyToMono(ArticleEntity.class)
+                .bodyToMono(ArticleDto.Output.class)
                 .block();
-
-        return ArticleDto.Output.builder()
-                .userId(entity.getUserId())
-                .id(entity.getId())
-                .title(entity.getTitle())
-                .body(entity.getBody())
-                .build();
     }
 
     @Override
-    public ArticleDto.Output createPost(ArticleDto articleDto) {
-        return null;
-    }
-
-    @Override
-    public ArticleDto.Output createPost(ArticleDto.Output articleDtoOutput) {
-        ArticleEntity created = webClient.post()
+    public ArticleDto.Output createPost(ArticleDto.Input articleDtoInput) {
+        return webClient.post()
                 .uri("/posts")
-                .bodyValue(articleDtoOutput)
+                .bodyValue(articleDtoInput)
                 .retrieve()
-                .bodyToMono(ArticleEntity.class)
+                .bodyToMono(ArticleDto.Output.class)
                 .block();
-
-        return ArticleDto.Output.builder()
-                .userId(created.getUserId())
-                .id(created.getId())
-                .title(created.getTitle())
-                .body(created.getBody())
-                .build();
     }
 }

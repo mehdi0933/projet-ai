@@ -11,11 +11,15 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;
 
@@ -36,21 +40,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Désactive CSRF pour API REST
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT = stateless
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
-                        .requestMatchers("/user/login","/user/test/permisAll").permitAll() // autorisés sans token
+                        .requestMatchers(HttpMethod.POST,  "/user/login").permitAll()   // <-- POST autorisé
+                        .requestMatchers( "/user/test/permisAll").permitAll()
+                        .requestMatchers("/user/post").permitAll()
                         .requestMatchers("/user/test/security").authenticated()
-                        .anyRequest().authenticated() // le reste nécessite un token
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // ajout du filtre JWT
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                //.formLogin(form -> form.permitAll())  // si tu veux un login form
+                //.logout(logout -> logout.permitAll());
 
         return http.build();
     }
 
-
-    // 🔹 Définition du UserDetailsService
+    //  Définition du UserDetailsService
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> {
@@ -64,7 +73,7 @@ public class SecurityConfig {
         };
     }
 
-    // 🔹 AuthenticationManager
+    // AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
@@ -74,4 +83,8 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder);
         return new ProviderManager(provider);
     }
+
+    // Service en mémoire pour tester des utilisateurs et rôles sans base de données
+
+
 }

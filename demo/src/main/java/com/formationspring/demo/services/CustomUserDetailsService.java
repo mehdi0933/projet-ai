@@ -2,6 +2,7 @@ package com.formationspring.demo.security;
 
 import com.formationspring.demo.dal.UserRepositoryJpa;
 import com.formationspring.demo.entity.UserEntity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,7 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with email: " + mail);
         }
+        return new org.springframework.security.core.userdetails.User(
+                user.getMail(),
+                user.getPassword(),
+                user.getRoles().stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
+                        .toList()
+        );
 
-        return new User(user.getMail(), user.getPassword(), Collections.emptyList());
     }
 }
