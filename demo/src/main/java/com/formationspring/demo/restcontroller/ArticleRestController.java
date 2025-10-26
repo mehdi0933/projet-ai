@@ -16,7 +16,6 @@ public class ArticleRestController {
 
     @PostMapping("/")
     public ArticleDto.Output createPost(@RequestBody ArticleDto.Input postInput) {
-        // On passe directement l'Input au service
         return postService.createPost(postInput);
     }
 

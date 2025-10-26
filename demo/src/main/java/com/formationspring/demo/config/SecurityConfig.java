@@ -53,7 +53,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-                //.formLogin(form -> form.permitAll())  // si tu veux un login form
+                //.formLogin(form -> form.permitAll())
                 //.logout(logout -> logout.permitAll());
 
         return http.build();
