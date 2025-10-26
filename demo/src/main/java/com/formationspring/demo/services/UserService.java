@@ -73,7 +73,6 @@ public class UserService implements UserInterface {
         return user;
     }
 
-    // Méthodes inutilisées pour JWT (peuvent être supprimées si tu veux)
     @Override
     public List<RegisterUserDto.PostOutput> getAllUsers() {
         List<UserEntity> users = userRepositoryJpa.findAll();
