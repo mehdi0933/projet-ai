@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login — Vibe Coding</title>
+    <style>
+        :root{
+          --bg:#071027; --card:#0c1a2b; --accent:#7ef3c3; --muted:rgba(230,238,248,0.6);
+          font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+        }
+        html,body{height:100%;margin:0;background:linear-gradient(135deg,#041029,#07102b);color:#e6eef8}
+        .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+        .card{width:100%;max-width:520px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:22px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,23,0.7)}
+        h1{margin:0 0 6px;font-size:20px}
+        p.lead{margin:0 0 16px;color:var(--muted);font-size:13px}
+        label{display:block;font-size:13px;margin:8px 0 6px}
+        .input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px;box-sizing:border-box}
+        .row{display:flex;gap:10px;align-items:center}
+        .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(90deg, rgba(126,243,195,0.12), rgba(126,243,195,0.08));color:var(--accent);font-weight:600}
+        .muted{color:var(--muted);font-size:13px}
+        .error{color:#ffb4b4;background:rgba(255,20,20,0.04);padding:8px;border-radius:8px;margin-bottom:10px}
+        .success{color:#b8ffd6;background:rgba(34,197,94,0.04);padding:8px;border-radius:8px;margin-bottom:10px}
+        .small{font-size:12px}
+        .roles{margin-top:14px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);font-size:13px}
+        .toggle-pass{position:relative}
+        .toggle-pass button{position:absolute;right:8px;top:8px;background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px}
+        .loader{width:16px;height:16px;border:3px solid rgba(255,255,255,0.06);border-top:3px solid var(--accent);border-radius:50%;animation:spin .9s linear infinite;margin-left:8px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        footer{margin-top:12px;text-align:center;font-size:12px;color:rgba(230,238,248,0.45)}
+        .actions{display:flex;gap:8px;margin-top:12px}
+        pre{white-space:pre-wrap;margin:6px 0 0 0}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <form id="loginForm" class="card" onsubmit="return false" autocomplete="on">
+        <h1>Connexion — Vibe</h1>
+        <p class="lead">Se connecter pour récupérer un JWT et tester des endpoints protégés.</p>
+
+        <div id="message"></div>
+
+        <label for="mail">E-mail</label>
+        <input id="mail" class="input" type="email" placeholder="toi@exemple.com" required>
+
+        <label for="password">Mot de passe</label>
+        <div class="toggle-pass">
+            <input id="password" class="input" type="password" placeholder="••••••••" required>
+            <button id="togglePwd" type="button" aria-label="Afficher le mot de passe">Afficher</button>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <label class="muted small"><input id="remember" type="checkbox" style="margin-right:8px"> Se souvenir</label>
+            <a href="#" class="muted small" onclick="alert('Implémente côté backend la récupération de mot de passe')">Mot de passe oublié ?</a>
+        </div>
+
+        <div class="actions">
+            <button id="submitBtn" class="btn" type="button">Se connecter <span id="spinner" style="display:none" class="loader" aria-hidden="true"></span></button>
+            <button id="clearBtn" type="button" class="btn" style="background:none;color:var(--muted);border:1px solid rgba(255,255,255,0.03)">Effacer</button>
+            <button id="testProtected" type="button" class="btn" style="background:none;color:var(--muted);border:1px solid rgba(255,255,255,0.03)">Tester endpoint protégé</button>
+        </div>
+
+        <div id="rolesBox" class="roles" style="display:none"></div>
+
+        <footer>→ Back-end attendu : POST /user/login renvoyant JSON { "token": "..." } • Utilise HTTPS en prod</footer>
+    </form>
+</div>
+
+<script>
+    // ====== CONFIG ======
+    const API_BASE = ''; // vide => même origine. Exemple: 'https://api.monsite.com'
+    const LOGIN_PATH = '/user/login';
+    const PROTECTED_PATH = '/user/admin/dashboard'; // endpoint pour test (requiert role ADMIN selon ton backend)
+    // =====================
+
+    const mailEl = document.getElementById('mail');
+    const pwEl = document.getElementById('password');
+    const toggleBtn = document.getElementById('togglePwd');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const testBtn = document.getElementById('testProtected');
+    const spinner = document.getElementById('spinner');
+    const message = document.getElementById('message');
+    const rolesBox = document.getElementById('rolesBox');
+    const remember = document.getElementById('remember');
+
+    toggleBtn.addEventListener('click', () => {
+      const t = pwEl.type === 'password' ? 'text' : 'password';
+      pwEl.type = t;
+      toggleBtn.textContent = t === 'text' ? 'Masquer' : 'Afficher';
+    });
+
+    clearBtn.addEventListener('click', () => {
+      mailEl.value = ''; pwEl.value = ''; clearMessage(); rolesBox.style.display='none';
+      sessionStorage.removeItem('jwt_token'); localStorage.removeItem('jwt_token');
+    });
+
+    submitBtn.addEventListener('click', async () => {
+      clearMessage(); rolesBox.style.display='none';
+      setLoading(true);
+      const payload = { mail: mailEl.value.trim(), password: pwEl.value };
+
+      try {
+        const res = await fetch(API_BASE + LOGIN_PATH, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          // credentials: 'include' // si cookies
+        });
+
+        if (!res.ok) {
+          let errText = await safeText(res);
+          showError(errText || `Erreur ${res.status} — identifiants invalides ou problème serveur.`);
+          return;
+        }
+
+        // Attendu : { "token": "..." }
+        const data = await res.json().catch(() => null);
+        const token = data && data.token ? data.token : null;
+
+        if (!token) {
+          showError('Réponse serveur inattendue : token manquant. (attendu JSON { "token": "..." })');
+          return;
+        }
+
+        // Stockage
+        if (remember.checked) localStorage.setItem('jwt_token', token);
+        else sessionStorage.setItem('jwt_token', token);
+
+        showSuccess('Authentification OK — token stocké.');
+        displayJwtPayload(token);
+
+      } catch (err) {
+        console.error(err);
+        showError('Impossible de joindre le serveur — vérifie URL/CORS.');
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    testBtn.addEventListener('click', async () => {
+      clearMessage();
+      setLoading(true);
+      const token = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+      if (!token) { showError('Aucun token trouvé. Connecte-toi d’abord.'); setLoading(false); return; }
+
+      try {
+        const res = await fetch(API_BASE + PROTECTED_PATH, {
+          method: 'GET',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (res.ok) {
+          const text = await res.text();
+          showSuccess('Réponse protégée : ' + text);
+        } else {
+          let err = await safeText(res);
+          showError(err || `Accès refusé (${res.status}). Vérifie rôles / token.`);
+          if (res.status === 401) {
+            // token peut être expiré -> proposer suppression
+            showError('401 — Token expiré ou invalide. Supprime le token et reconnecte-toi.');
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        showError('Erreur réseau lors de l’appel protégé.');
+      } finally { setLoading(false); }
+    });
+
+    // ===== helpers =====
+    function setLoading(on) {
+      submitBtn.disabled = on;
+      testBtn.disabled = on;
+      clearBtn.disabled = on;
+      spinner.style.display = on ? 'inline-block' : 'none';
+    }
+
+    function showError(txt) {
+      message.innerHTML = '<div class="error">' + escapeHtml(txt) + '</div>';
+    }
+    function showSuccess(txt) {
+      message.innerHTML = '<div class="success">' + escapeHtml(txt) + '</div>';
+    }
+    function clearMessage(){ message.innerHTML = ''; }
+
+    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>"']/g, s=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+
+    async function safeText(res) {
+      try {
+        const t = await res.text();
+        return t && t.length < 800 ? t : null;
+      } catch(e){ return null; }
+    }
+
+    // Décoder payload JWT (base64url)
+    function parseJwtPayload(token) {
+      try {
+        const parts = token.split('.');
+        if (parts.length < 2) return null;
+        const b64 = parts[1].replace(/-/g,'+').replace(/_/g,'/');
+        const json = decodeURIComponent(atob(b64).split('').map(c=> '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+        return JSON.parse(json);
+      } catch(e){ return null; }
+    }
+
+    function displayJwtPayload(token) {
+      const payload = parseJwtPayload(token);
+      if (!payload) { rolesBox.style.display='none'; return; }
+      const exp = payload.exp ? new Date(payload.exp * 1000).toISOString() : 'n/a';
+      const sub = payload.sub || payload.username || payload.email || '(subject n/a)';
+      const roles = payload.roles || payload.authorities || payload.role || null;
+
+      rolesBox.style.display = 'block';
+      rolesBox.innerHTML = '<strong>JWT payload</strong>' +
+        `<div class="small">subject: ${escapeHtml(sub)} • exp: ${escapeHtml(exp)}</div>` +
+        `<pre>${escapeHtml(JSON.stringify(payload, null, 2))}</pre>`;
+    }
+
+    // Si tu veux pré-remplir pour tests locaux
+    // mailEl.value = 'admin@example.com'; pwEl.value = 'admin123';
+
+    // Charger token existant à l'ouverture
+    (function init() {
+      const t = localStorage.getItem('jwt_token') || sessionStorage.getItem('jwt_token');
+      if (t) displayJwtPayload(t);
+    })();
+</script>
+</body>
+</html>
