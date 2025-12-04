@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>JirAWS</title>
+    <style>
+        body { font-family: Arial; text-align: center; padding: 20px; }
+        h1 { color: red; }
+        input, select, button { margin: 10px 0; padding: 8px; font-size: 16px; }
+        #text { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<h1>JirAWS</h1>
+
+<select id="ListeIa">
+    <option value="">-- Sélectionner votre IA --</option>
+</select>
+<input type="text" id="questionIa" placeholder="Écris quelque chose">
+<button id="btn">Envoyer</button>
+<div id="result"></div>
+<div id="text"></div>
+<div id="resultDiv"></div>
+
+<input type="email" id="mailInput" placeholder="Entrez votre email">
+<button id="fetchBtn">Chercher</button>
+<div id="helloResult"></div>
+
+
+<script>
+    const select = document.getElementById("ListeIa");
+    const inputQuestionIa = document.getElementById("questionIa");
+    const btn = document.getElementById("btn");
+    const text = document.getElementById("text");
+    const mailInput = document.getElementById("mailInput");
+    const fetchBtn = document.getElementById("fetchBtn");
+    const resultDiv = document.getElementById("resultDiv");
+    const helloResult = document.getElementById("helloResult");
+
+    ["MISTRAL", "HUNYUAN"].forEach(option => {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.textContent = option;
+        select.appendChild(opt);
+    });
+
+    btn.addEventListener("click", async () => {
+        const question = inputQuestionIa.value.trim();
+        const ia = select.value;
+        if (!question || !ia) return alert("Sélectionne une IA et écris une question !");
+
+        try {
+            const response = await fetch("http://localhost:8080/ai/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    promptMsg: question,
+                    model: ia,
+                    url: "https://openrouter.ai/api/v1/chat/completions",
+                    apiKey: "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"
+                })
+            });
+            const resultat = await response.text();
+            text.innerHTML = `<pre>${resultat}</pre>`;
+        } catch (err) {
+            text.textContent = "Erreur lors de l'appel au serveur.";
+            console.error(err);
+        }
+    });
+
+// testFetch.js
+
+fetch('http://localhost:8080/user/test/permisAll',{ // ne fonctionne pas erreur 404
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+})
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Erreur HTTP : ' + response.status);
+    }
+    return response.text(); // le endpoint renvoie du texte
+  })
+  .then(data => {
+    console.log('Réponse du serveur :', data);
+  })
+  .catch(error => {
+    console.error('Erreur lors du fetch :', error);
+  });
+
+</script>
+
+
+</body>
+</html>
