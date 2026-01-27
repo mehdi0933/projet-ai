@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Chat IA - Assistant</title>
+  <style>
+    body { margin:0; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f7f6; display:flex; justify-content:center; padding:20px; }
+    .container { width:100%; max-width:800px; background:white; padding:30px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.08); }
+    h2 { color:#333; border-bottom:2px solid #eee; padding-bottom:10px; margin-top: 0; }
+    textarea { width:100%; padding:15px; border-radius:8px; border:1px solid #ddd; font-size:16px; box-sizing:border-box; resize: vertical; }
+    select, button { width:100%; padding:12px; margin-top:10px; border-radius:8px; border:none; font-size: 16px; }
+    button { background:#28a745; color:white; font-weight:bold; cursor:pointer; transition: background 0.3s; }
+    button:hover { background: #218838; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    #resultList { margin-top:20px; padding:15px; background:#f8f9fa; border-radius:8px; min-height:100px; border-left:4px solid #007bff; white-space: pre-wrap; color: #333; line-height: 1.5; }
+    .nav { display:flex; justify-content:space-between; margin-bottom:15px; align-items: center; }
+    .user-info { font-size: 0.9em; color: #666; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="nav">
+    <strong>IA Assistant</strong>
+    <div>
+      <span id="displayUser" class="user-info"></span> |
+      <a href="historique.html" style="text-decoration:none; color:#007bff; font-weight: bold;">Voir l'historique</a>
+    </div>
+  </div>
+
+  <h2>Posez votre question</h2>
+  <textarea id="prompt" rows="4" placeholder="Tapez votre message ici..."></textarea>
+
+  <select id="model">
+    <option value="MISTRAL">MISTRAL</option>
+    <option value="HUNYUAN">HUNYUAN</option>
+    <option value="FAKEAI">FakeAi</option>
+  </select>
+
+  <button id="sendBtn" onclick="send()">Envoyer la requête</button>
+
+  <div id="resultList">Les réponses de l'IA apparaîtront ici...</div>
+</div>
+
+<script>
+  const API = "http://localhost:8080/ia";
+  const API_KEY = "sk-or-v1-ac13850b49e18dc1defe29e1b312db357ad8c76fc77f24ea3202974958";
+
+  // Au chargement, on vérifie si l'utilisateur est connecté
+  window.onload = function() {
+      const email = localStorage.getItem("userEmail");
+      if (email) {
+          document.getElementById("displayUser").innerText = email;
+      } else {
+          // Si pas d'email, on redirige vers le login ou on affiche un avertissement
+          document.getElementById("displayUser").innerHTML = "<b style='color:red;'>Non connecté</b>";
+      }
+  };
+
+  async function send() {
+      const promptInput = document.getElementById("prompt");
+      const resultDiv = document.getElementById("resultList");
+      const sendBtn = document.getElementById("sendBtn");
+
+      const prompt = promptInput.value.trim();
+      const model = document.getElementById("model").value;
+
+      // RÉCUPÉRATION DES INFOS DE SESSION
+      const token = localStorage.getItem("token");
+      const userEmail = localStorage.getItem("userEmail"); // Crucial pour éviter l'erreur 500
+
+      if(!prompt) return;
+
+      if(!userEmail || !token) {
+          resultDiv.innerText = "Erreur : Vous devez être connecté pour effectuer une recherche.";
+          return;
+      }
+
+      // UI State
+      resultDiv.innerText = "Analyse en cours par l'IA...";
+      sendBtn.disabled = true;
+
+      try {
+          const response = await fetch(`${API}/ai/search`, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer " + token
+              },
+              body: JSON.stringify({
+                  promptMsg: prompt,
+                  model: model,
+                  apiKey: API_KEY,
+                  url: "https://openrouter.ai/api/v1/chat/completions",
+                  user: userEmail // On envoie l'email pour le findByMail côté Java
+              })
+          });
+
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || "Erreur serveur (500)");
+          }
+
+          const data = await response.text();
+          resultDiv.innerText = data;
+          promptInput.value = ""; // Vide le champ après succès
+
+      } catch(e) {
+          resultDiv.innerHTML = `<span style="color:red;">Erreur : ${e.message}</span>`;
+          console.error("Détails de l'erreur:", e);
+      } finally {
+          sendBtn.disabled = false;
+      }
+  }
+</script>
+</body>
+</html>
