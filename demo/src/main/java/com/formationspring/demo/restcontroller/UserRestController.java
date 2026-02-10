@@ -1,14 +1,19 @@
 package com.formationspring.demo.restcontroller;
 
+import com.formationspring.demo.entity.RoleEntity;
+import com.formationspring.demo.entity.UserEntity;
 import com.formationspring.demo.jwt.JwtUtil;
 import org.example.dto.UserDto;
-import com.formationspring.demo.services.Interface.UserInterface;
+import com.formationspring.demo.services.contracts.UserInterface;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.example.dto.RegisterUserDto;
+import org.example.dto.RegisterUserDto;
 
 @RestController
 @RequestMapping("/user")
@@ -25,9 +30,8 @@ public class UserRestController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserDto.PostInput input) {
+    public String login(@RequestBody RegisterUserDto.PostInput input) {
         try {
-
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(input.getMail(), input.getPassword())
             );
@@ -35,12 +39,16 @@ public class UserRestController {
             throw new RuntimeException("Email ou mot de passe incorrect");
         }
 
-        return jwtUtil.generateToken(input.getMail());
+        UserEntity user = userService.findByMail(input.getMail());
+        Set<String> roles = user.getRoles().stream()
+                .map(RoleEntity::getName)
+                .collect(Collectors.toSet());
+
+        return jwtUtil.generateToken(user.getMail(), roles);
     }
 
-
     @PostMapping("/post")
-    public List<UserDto.PostOutput> saveAllUsers(@RequestBody List<UserDto.PostInput> users) {
+    public List<RegisterUserDto.PostOutput> saveAllUsers(@RequestBody List<RegisterUserDto.PostInput> users) {
         return userService.saveAllUsers(users);
     }
 
@@ -52,5 +60,10 @@ public class UserRestController {
     @GetMapping("/test/security")
     public String security() {
         return "je suis le test security ";
+    }
+
+    @GetMapping("/admin/dashboard")
+    public String adminDashboard() {
+        return "Bienvenue sur le dashboard ADMIN";
     }
 }

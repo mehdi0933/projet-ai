@@ -1,13 +1,12 @@
-package com.formationspring.demo.services.Interface;
+package com.formationspring.demo.services.contracts;
 
-import org.example.dto.UserDto;
-
+import org.example.dto.RegisterUserDto;
+import com.formationspring.demo.entity.UserEntity;
 import java.util.List;
 
 public interface UserInterface {
-
-    List<UserDto.PostOutput> getAllUsers();
-    List<UserDto.PostOutput> saveAllUsers(List<UserDto.PostInput> users);
-    UserDto.PostOutput findByMailAndPassword(String mail, String password);
-
+    List<RegisterUserDto.PostOutput> getAllUsers();
+    List<RegisterUserDto.PostOutput> saveAllUsers(List<RegisterUserDto.PostInput> users);
+    RegisterUserDto.PostOutput findByMailAndPassword(String mail, String password);
+    UserEntity findByMail(String mail);
 }
